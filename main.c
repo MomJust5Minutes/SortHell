@@ -12,7 +12,7 @@ int main()
     printf("TAMANHO: [%d]", TAM);
     printf("\nSEED: [%d]\n\n", SEED);
     setlocale(LC_ALL,"Portuguese");
-    srand(time(NULL));
+    srand(SEED);
     clock_t inicio, fim;
     Estrutura *array = (Estrutura*) malloc(TAM * sizeof(Estrutura));
 
