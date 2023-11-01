@@ -20,7 +20,7 @@ void insertionSort(Estrutura *v, int n) {
     int i, j;
     for (i = 1; i < n; i++) {
        for(j = i; j >= 1; j--) {
-            if (v[j-1].chave < v[j].chave) { // Comparação invertida para ordem decrescente
+            if (v[j-1].chave < v[j].chave) { // ComparaÃ§Ã£o invertida para ordem decrescente
                 trocar(&v[j-1], &v[j]);
             }
        }
@@ -31,7 +31,7 @@ void bubbleSort(Estrutura *v, int n) {
     int i, j;
     for (i = 0; i < n-1; i++) {
        for(j = 1; j < n-i; j++) {
-            if (v[j].chave > v[j-1].chave) { // Comparação invertida para ordem decrescente
+            if (v[j].chave > v[j-1].chave) { // ComparaÃ§Ã£o invertida para ordem decrescente
                 trocar(&v[j-1], &v[j]);
             }
        }
@@ -50,7 +50,7 @@ void shellSort(Estrutura *v, int n) {
             aux = v[i];
             j = i;
 
-            while (j - h >= 0 && v[j - h].chave < aux.chave) { // Comparação invertida para ordem decrescente e adicionado lógica para evitar out of bounds
+            while (j - h >= 0 && v[j - h].chave < aux.chave) { // ComparaÃ§Ã£o invertida para ordem decrescente e adicionado lÃ³gica para evitar out of bounds
                 v[j] = v[j - h];
                 j -= h;
                 if (j<h) break;
@@ -65,20 +65,21 @@ void merge(Estrutura *v, int *c, int i, int m, int f) {
     for (z = i; z <= f; z++) c[z] = v[z].chave;
     z = i;
     while (iv <= m && ic <= f) {
-            if (c[iv] <= c[ic]) {
-                v[z++].chave = c[iv++];
-            }
-            else {
-                v[z++].chave = c[ic++];
-            }
-        while (iv <= m) {
+        if (c[iv] >= c[ic]) {  // Changed the comparison to sort in descending order
             v[z++].chave = c[iv++];
         }
-        while (ic <= f) {
+        else {
             v[z++].chave = c[ic++];
         }
     }
+    while (iv <= m) {
+        v[z++].chave = c[iv++];
+    }
+    while (ic <= f) {
+        v[z++].chave = c[ic++];
+    }
 }
+
 
 void sort(Estrutura *v, int *c, int i, int f) {
     if (i < f) {
@@ -97,36 +98,83 @@ void mergeSort(Estrutura *v, int n) {
     free(c);
 }
 
-int particao(Estrutura *v, int LI, int LS) {
+int particaoPivoSuperior(Estrutura *v, int LI, int LS) {
     int aux, pivo, e = LI, d = LS;
-    pivo = v[e].chave;  // Escolha do pivô como o valor da chave do primeiro elemento
+    pivo = v[LI].chave;  // Choose the pivot as the value of the lower limit
+
+    while (1) {  // Infinite loop to break when e >= d
+        while (e <= LS && v[e].chave >= pivo) {
+            e++;
+        }
+        while (d >= LI && v[d].chave < pivo) {
+            d--;
+        }
+        if (e < d) {
+            // Swap elements at indices e and d
+            aux = v[e].chave;
+            v[e].chave = v[d].chave;
+            v[d].chave = aux;
+        } else {
+            break;
+        }
+    }
+
+    // Swap the pivot with the element at index d
+    aux = v[LI].chave;
+    v[LI].chave = v[d].chave;
+    v[d].chave = aux;
+
+    return d;
+}
+
+int particaoPivoInferior(Estrutura *v, int LI, int LS) {
+    int aux, pivo, e = LI, d = LS;
+    pivo = v[LI].chave;  // Escolha do pivÃ´ como o valor da chave do limite inferior
     while (e < d) {
-        while ((v[e].chave >= pivo) && (e < LS)) { e++; } // Condição invertida para elementos menores
-        while ((v[d].chave < pivo) && (d > LI)) { d--; }  // Condição invertida para elementos maiores
+        while ((v[e].chave >= pivo) && (e < LS)) { e++; } // CondiÃ§Ã£o invertida para elementos menores
+        while ((v[d].chave < pivo) && (d > LI)) { d--; }  // CondiÃ§Ã£o invertida para elementos maiores
         if (e < d) {
             aux = v[e].chave;
-            v[e].chave = v[d].chave;  // Troca dos elementos de posição
+            v[e].chave = v[d].chave;  // Troca dos elementos de posiÃ§Ã£o
             v[d].chave = aux;
         }
     }
     aux = v[LI].chave;
-    v[LI].chave = v[d].chave;  // Troca do pivô com a posição final
+    v[LI].chave = v[d].chave;  // Troca do pivÃ´ com a posiÃ§Ã£o final
     v[d].chave = aux;
     return d;
 }
 
-void quickSort(Estrutura *v, int LI, int LS)
-{
-    if(LI<LS)
-    {
+int particaoPivoMeio(Estrutura *v, int LI, int LS) {
+    int aux, pivo, e = LI, d = LS;
+    int meio = LI + (LS - LI) / 2;  // Encontra o Ã­ndice do meio do subvetor
+    pivo = v[meio].chave;  // Escolha do pivÃ´ como o valor da chave do meio
+    while (e < d) {
+        while ((v[e].chave >= pivo) && (e < LS)) { e++; } // CondiÃ§Ã£o invertida para elementos menores
+        while ((v[d].chave < pivo) && (d > LI)) { d--; }  // CondiÃ§Ã£o invertida para elementos maiores
+        if (e < d) {
+            aux = v[e].chave;
+            v[e].chave = v[d].chave;  // Troca dos elementos de posiÃ§Ã£o
+            v[d].chave = aux;
+        }
+    }
+    aux = v[meio].chave;
+    v[meio].chave = v[d].chave;  // Troca do pivÃ´ com a posiÃ§Ã£o final
+    v[d].chave = aux;
+    return d;
+}
+
+void quickSort(Estrutura *v, int LI, int LS, int (*escolherPivo)(Estrutura *, int, int)) {
+    if (LI < LS) {
         int p;
-        p = particao(v,LI,LS);
-        quickSort(v,LI,p-1);
-        quickSort(v,p+1,LS);
+        p = escolherPivo(v, LI, LS); // Chama a funÃ§Ã£o para escolher o pivÃ´
+        quickSort(v, LI, p - 1, escolherPivo);
+        quickSort(v, p + 1, LS, escolherPivo);
     }
 }
 
-// Função para ajustar um heap mínimo com raiz em dado índice (para ordenação decrescente)
+
+// FunÃ§Ã£o para ajustar um heap mÃ­nimo com raiz em dado Ã­ndice (para ordenaÃ§Ã£o decrescente)
 void minHeapify(Estrutura *v, int n, int i) {
     int menor = i;
     int esquerda = 2 * i + 1;
@@ -146,14 +194,14 @@ void minHeapify(Estrutura *v, int n, int i) {
     }
 }
 
-// Função para construir um heap mínimo (para ordenação decrescente)
+// FunÃ§Ã£o para construir um heap mÃ­nimo (para ordenaÃ§Ã£o decrescente)
 void buildMinHeap(Estrutura *v, int n) {
     for (int i = n / 2 - 1; i >= 0; i--) {
         minHeapify(v, n, i);
     }
 }
 
-// Função principal do Heap Sort para ordenação decrescente
+// FunÃ§Ã£o principal do Heap Sort para ordenaÃ§Ã£o decrescente
 void heapSort(Estrutura *v, int n) {
     buildMinHeap(v, n);
 
@@ -163,11 +211,18 @@ void heapSort(Estrutura *v, int n) {
     }
 }
 
-// A função para calcular o tempo de execução do algoritmo de ordenação
-void calcularTempo(Estrutura arr[], int n, int escolha) {
-    clock_t inicio;
+void imprimirVetor(Estrutura arr[], int n) {
+    printf("\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t", arr[i].chave);
+    }
+    printf("\n");
+}
 
-    switch (escolha){
+void calcularTempo(Estrutura arr[], int n, int escolha) {
+    clock_t inicio, fim;
+
+    switch (escolha) {
         case 1:
             inicio = clock();
             insertionSort(arr, n);
@@ -186,37 +241,29 @@ void calcularTempo(Estrutura arr[], int n, int escolha) {
             break;
         case 5:
             inicio = clock();
-            quickSort(arr, 0, n);
-            break;
-        case 6:
-            inicio = clock();
             heapSort(arr, n);
             break;
     }
 
-
-    clock_t fim = clock();
-
-    double tempo = (double)(fim - inicio) / CLOCKS_PER_SEC;
-
-    printf("\t\tTempo de execucao: [%.3fs]!",tempo);
+    fim = clock();
+    printf("\t\tTempo de execuÃ§Ã£o: [%.3fs]!", (double)(fim - inicio) / CLOCKS_PER_SEC);
 }
 
-// Função para gerar valores aleatórios para as estruturas
+// FunÃ§Ã£o para gerar valores aleatÃ³rios para as estruturas
 void gerar_aleatorio(Estrutura estrutura[], int n) {
     int i;
     for (i = 0; i < n; i++) {
-        estrutura[i].chave = rand() % 100000; // Gera valores aleatórios para a chave (0-99999)
+        estrutura[i].chave = rand() % 100000; // Gera valores aleatÃ³rios para a chave (0-99999)
         estrutura[i].valor = 100.0 + ((double)rand() / RAND_MAX) * 99899.99;
     }
 }
 
-// Função para gerar a chave em ordem crescente e valores aleatórios para as estruturas
+// FunÃ§Ã£o para gerar a chave em ordem crescente e valores aleatÃ³rios para as estruturas
 void gerar_crescente(Estrutura estrutura[], int n) {
     int i;
     for (i = 0; i < n; i++) {
         estrutura[i].chave = i; // Gera a chave em ordem crescente
-        estrutura[i].valor = 100.0 + ((double)rand() / RAND_MAX) * 99899.99; // Gera valores aleatórios para o número real (entre 100 e 99999.99)
+        estrutura[i].valor = 100.0 + ((double)rand() / RAND_MAX) * 99899.99; // Gera valores aleatÃ³rios para o nÃºmero real (entre 100 e 99999.99)
     }
 }
 
