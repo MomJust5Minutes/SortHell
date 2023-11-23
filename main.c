@@ -16,9 +16,9 @@ int main()
     clock_t inicio, fim;
     Estrutura *array = (Estrutura*) malloc(TAM * sizeof(Estrutura));
 
-    // Selection Sort
+    // Insertion Sort
     // Tipo 1
-    printf("Selection Sort:\n\tTipo 1:\n");
+    printf("Insertion Sort:\n\tTipo 1:\n");
     gerar_aleatorio(array,TAM);
     calcularTempo(array,TAM,1);
     // Tipo 2
